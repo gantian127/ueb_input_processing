@@ -6,21 +6,22 @@ import callSubprocess
 import watershedFunctions
 
 # user settings to change
-## Domain bounding box in geographic coordinates left, top, right, bottom.  Must enclose watershed of interest
-# # Animas River WS above Durango
-# leftX, topY, rightX, bottomY = -108.15, 38.06, -107.41, 37.16
-# watershedN = 'Animas'
+main_folder = "/Projects/Tian_workspace/rdhm_ueb_modeling/animas_2007_rec/"
 
 # Dolores at Dolores
 leftX, topY, rightX, bottomY = -108.525, 37.865, -107.85, 37.43  # exact box: -108.51773, 37.857910, -107.863539, 37.437081
 watershedN = 'Mcphee_DOLC2'
 
-main_folder = "/Projects/Tian_workspace/rdhm_ueb_modeling/animas_2007_rec/"
-
 startYear = 2006 # datetime.strptime(startDateTime,"%Y/%m/%d %H").year
 endYear = 2007  # datetime.strptime(endDateTime,"%Y/%m/%d %H").year
 startMonthDayHour = "10/01 0"
 endMonthDayHour = "10/01 0"
+
+## Domain bounding box in geographic coordinates left, top, right, bottom.  Must enclose watershed of interest
+# # Animas River WS above Durango
+# leftX, topY, rightX, bottomY = -108.15, 38.06, -107.41, 37.16
+# watershedN = 'Animas'
+
 
 # make tempdir
 workingDir = main_folder + 'tempdir'  # This should be a temp folder under the main folder. It is used to store the temp data for nldas processing
@@ -34,7 +35,7 @@ UNIT["degree",0.0174532925199433]],PROJECTION["Polar_Stereographic"],PARAMETER["
 PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]]]'
 ##proj4_string = '+proj=stere +lat_0=90.0 +lat_ts=60.0 +lon_0=-105.0 +k=1 +x_0=0.0 +y_0=0.0 +a=6371200 +b=6371200 +units=m +no_defs'
 
-inputXmrgRaster = 'we0101200706z.gz'
+inputXmrgRaster = 'xmrg1001198812z.gz'
 referenceRasterASCII = os.path.join(workingDir, watershedN+'_refRaster.asc')
 referenceRasterTIF = os.path.join(workingDir, watershedN+'_refRaster.tif')
 referenceRasterNC = os.path.join(workingDir, watershedN+'_refRaster.nc')
