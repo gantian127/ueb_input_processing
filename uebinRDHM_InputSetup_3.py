@@ -4,13 +4,16 @@ from datetime import datetime
 import rdhmFunctions
 import callSubprocess
 """*********** Convert UEB NC files to XMRG with HRAP projection *****************"""
+# # user settings to change
 workingDir = "/Projects/Tian_workspace/rdhm_ueb_modeling/animas_2007_rec/"
 watershedN = 'Animas'
+
 startDateTime = "2006/10/01 0"
 endDateTime = "2007/10/01 0"
 startYear = 2006  # datetime.strptime(startDateTime,"%Y/%m/%d %H").year
 endYear = 2007  # datetime.strptime(endDateTime,"%Y/%m/%d %H").year
-time_varName='time'
+time_varName ='time'
+
 
 #proj4_string: see the paper: Reed, S.M., and D.R. Maidment, "Coordinate Transformations for Using NEXRAD Data in GIS-based Hydrologic Modeling," Journal of Hydrologic Engineering, 4, 2, 174-182, April 1999
 ## http://www.nws.noaa.gov/ohd/hrl/distmodel/hrap.htm#background
