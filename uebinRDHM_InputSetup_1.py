@@ -10,15 +10,13 @@ workingDir = "/Projects/Tian_workspace/rdhm_ueb_modeling/animas_2007_rec/"
 # leftX, topY, rightX, bottomY =  -110.415, 43.593, -109.492, 42.871
 # # Animas River WS above Durango
 # leftX, topY, rightX, bottomY =  -108.15, 38.06, -107.41, 37.16
-# watershedName = 'Animas'
+# watershedN = 'Animas'
 
 # Dolores at Dolores
-# leftX, topY, rightX, bottomY = -108.52, 37.86, -107.98, 37.43  # exact box: -108.51773, 37.857910, -107.984374, 37.437081
-# watershedName = 'Mcphee_DOLC2'
+leftX, topY, rightX, bottomY = -108.52, 37.86, -107.98, 37.43  # exact box: -108.51773, 37.857910, -107.984374, 37.437081
+watershedN = 'Mcphee_DOLC2'
 
-# Whole colorado
-leftX, topY, rightX, bottomY = -110.27, 43.46, -105.69, 36.057 # exact box: -110.263652 , 43.457863, -105.692643, 36.057933
-watershedName = 'Colorado'
+
 # Grid projection
 #utmZone = int((180 + 0.5*(xmin+xmax))/6) + 1
 epsgCode = 26912    #26912                 #26912 utm 12
@@ -40,19 +38,19 @@ for item in HDS.list_my_files():
 #### Subset DEM and Delineate Watershed
 input_static_DEM = 'nedWesternUS.tif'
 subsetDEM_request = HDS.subset_raster(input_raster=input_static_DEM, left=leftX, top=topY, right=rightX,
-                                      bottom=bottomY,output_raster=watershedName + 'DEM84.tif')
+                                      bottom=bottomY,output_raster=watershedN + 'DEM84.tif')
 #Options for projection with epsg full list at: http://spatialreference.org/ref/epsg/
-Watershed30mDEM = watershedName+str(dx)+'m.tif'
+Watershed30mDEM = watershedN+str(dx)+'m.tif'
 WatershedDEM = HDS.project_resample_raster(input_raster_url_path=subsetDEM_request['output_raster'],
                                                       cell_size_dx=dx, cell_size_dy=dy, epsg_code=epsgCode,
                                                       output_raster=Watershed30mDEM,resample='bilinear')
 # #Resample watershed grid to coarser grid (to save time)
 #
-# WatershedResDEM = watershedName + 'DEM' + str(dxRes) + 'm.tif'
+# WatershedResDEM = watershedN + 'DEM' + str(dxRes) + 'm.tif'
 # WatershedRes =  HDS.resample_raster(input_raster_url_path= WatershedDEM['output_raster'],
 #                 cell_size_dx=dxRes, cell_size_dy=dyRes, resample='near', output_raster=WatershedResDEM)
 # ##  Convert to netCDF
-# WatershedResNC = watershedName + 'NC' + str(dxRes) + 'm.nc'
+# WatershedResNC = watershedN + 'NC' + str(dxRes) + 'm.nc'
 # Watershed_resnc = HDS.raster_to_netcdf(WatershedRes['output_raster'], output_netcdf=WatershedResNC)
 
 ## use 'referenceRasterTIF' or 'WatershedResNC' for resampling
@@ -69,9 +67,9 @@ PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northi
 
 ##reference xmrg file ---must be located in the workingDir
 inputXmrgRaster = 'real_uztwc0830200922z.gz'
-referenceRasterASCII = watershedName+'_refRaster.asc'
-referenceRasterTIF = watershedName+'_refRaster.tif'
-referenceRasterNC = watershedName+'_refRaster.nc'
+referenceRasterASCII = watershedN+'_refRaster.asc'
+referenceRasterTIF = watershedN+'_refRaster.tif'
+referenceRasterNC = watershedN+'_refRaster.nc'
 cmdString = 'xmrgtoasc -p ster -i ' + inputXmrgRaster + ' -o ' + referenceRasterASCII
 callSubprocess.callSubprocess(cmdString, "xmrg to ascii")
 cmdString = "gdal_translate -a_srs \"" + proj4_string + "\" "+referenceRasterASCII+" "+referenceRasterTIF
@@ -81,10 +79,10 @@ watershedFunctions.rasterToNetCDF(referenceRasterTIF, referenceRasterNC)
 
 #terrain variables
 print 'aspect'
-aspectRaster = watershedName + 'Aspect' + str(dx) + 'm.tif'
+aspectRaster = watershedN + 'Aspect' + str(dx) + 'm.tif'
 aspect = HDS.create_raster_aspect(input_raster_url_path=WatershedDEM['output_raster'],
                                 output_raster=aspectRaster)
-slopeRaster = watershedName + 'Slope' + str(dx) + 'm.tif'
+slopeRaster = watershedN + 'Slope' + str(dx) + 'm.tif'
 slope = HDS.create_raster_slope(input_raster_url_path=WatershedDEM['output_raster'],
                                 output_raster=slopeRaster)
 #Land cover variables
@@ -92,21 +90,21 @@ print 'land cover'
 nlcd_raster_resource = 'nlcd2011CONUS.tif'
 subset_NLCD_result = HDS.project_clip_raster(input_raster=nlcd_raster_resource,
                                 ref_raster_url_path=WatershedDEM['output_raster'],
-                                output_raster=watershedName + 'nlcdProj' + str(dx) + '.tif')
-ccfracNC = watershedName+'CC'+str(dx)+'m.nc'
+                                output_raster=watershedN + 'nlcdProj' + str(dx) + '.tif')
+ccfracNC = watershedN+'CC'+str(dx)+'m.nc'
 ccfrac = HDS.get_canopy_variable(input_NLCD_raster_url_path=subset_NLCD_result['output_raster'],
                                 variable_name='cc', output_netcdf=ccfracNC)
-hcanNC = watershedName+'Hcan'+str(dx)+'m.nc'
+hcanNC = watershedN+'Hcan'+str(dx)+'m.nc'
 hcan = HDS.get_canopy_variable(input_NLCD_raster_url_path=subset_NLCD_result['output_raster'],
                                 variable_name='hcan', output_netcdf=hcanNC)
-laiNC = watershedName+'LAI'+str(dx)+'m.nc'
+laiNC = watershedN+'LAI'+str(dx)+'m.nc'
 lai = HDS.get_canopy_variable(input_NLCD_raster_url_path=subset_NLCD_result['output_raster'],
                                 variable_name='lai', output_netcdf=laiNC)
 
 #download to local disk
 print 'download'
 ueb_inputPackage_dict = [Watershed30mDEM, aspectRaster, slopeRaster, ccfracNC, hcanNC, laiNC]
-zipFileName = watershedName+'SiteVars.zip'
+zipFileName = watershedN+'SiteVars.zip'
 zip_files_result = HDS.zip_files(files_to_zip=ueb_inputPackage_dict, zip_file_name=zipFileName)
 
 HDS.download_file(file_url_path=zip_files_result['zip_file_name'], save_as=workingDir+zipFileName)
