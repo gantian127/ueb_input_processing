@@ -6,22 +6,17 @@ import callSubprocess
 import watershedFunctions
 
 ## Domain bounding box in geographic coordinates left, top, right, bottom.  Must enclose watershed of interest
-# # Animas River WS above Durango
-# leftX, topY, rightX, bottomY =  -108.15, 38.06, -107.41, 37.16
+# Animas River WS above Durango
+leftX, topY, rightX, bottomY =  -108.15, 38.06, -107.41, 37.16
 
-
-# Dolores at Dolores
-leftX, topY, rightX, bottomY = -108.52, 37.86, -107.98, 37.43  # exact box: -108.51773, 37.857910, -107.984374, 37.437081
-watershedN = 'Mcphee_DOLC2'
-
-startYear = 1988  # datetime.strptime(startDateTime,"%Y/%m/%d %H").year
-endYear = 2010  # datetime.strptime(endDateTime,"%Y/%m/%d %H").year
+watershedN = 'Animas'
+startYear = 2006 # datetime.strptime(startDateTime,"%Y/%m/%d %H").year
+endYear = 2007  # datetime.strptime(endDateTime,"%Y/%m/%d %H").year
 startMonthDayHour = "10/01 0"
 endMonthDayHour = "10/01 0"
 
-inputXmrgRaster = 'we0101200706z.gz'  # reference swe template
-
-workingDir = "/Projects/Tian_workspace/rdhm_ueb_modeling/McPhee_DOLC2/" + 'tempdir'  # This should be a temp folder under the main folder. It is used to store the temp data for nldas processing
+main_folder = "/Projects/Tian_workspace/rdhm_ueb_modeling/animas_2007_rec/"
+workingDir = main_folder + 'tempdir'  # This should be a temp folder under the main folder. It is used to store the temp data for nldas processing
 if not os.path.isdir(workingDir):
     os.mkdir(workingDir)
 
@@ -34,7 +29,7 @@ UNIT["degree",0.0174532925199433]],PROJECTION["Polar_Stereographic"],PARAMETER["
 PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]]]'
 ##proj4_string = '+proj=stere +lat_0=90.0 +lat_ts=60.0 +lon_0=-105.0 +k=1 +x_0=0.0 +y_0=0.0 +a=6371200 +b=6371200 +units=m +no_defs'
 
-
+inputXmrgRaster = 'we0101200706z.gz'
 referenceRasterASCII = os.path.join(workingDir, watershedN+'_refRaster.asc')
 referenceRasterTIF = os.path.join(workingDir, watershedN+'_refRaster.tif')
 referenceRasterNC = os.path.join(workingDir, watershedN+'_refRaster.nc')
@@ -49,8 +44,8 @@ watershedFunctions.rasterToNetCDF(referenceRasterTIF, referenceRasterNC)
 #cbrfc forcing is converted to xmrg for the whole upper colorado --similar to what RTI are doing
 print 'start cbrfc processing'
 workingDir1 = "/Projects/cbrfcTP/"
+targetDir1 = os.path.join(main_folder, "Forcing/")
 os.chdir(workingDir1)
-targetDir1 = os.path.join(os.getcwd(), "Forcing/")
 if not os.path.isdir(targetDir1):
     os.mkdir(targetDir1)
 print 'subset and copy cbrfc to forcing folder'
@@ -182,7 +177,7 @@ for cYear in range(startYear,endYear):
 #nldas2
 print 'start nldas processing'
 workingDir2 = "/Projects/nldasMonthly/"
-targetDirVPW = os.path.join(os.getcwd(), "Forcing")
+targetDirVPW = os.path.join(main_folder, "Forcing")
 
 intermQ = watershedN + 'Q.nc'
 intermPress = watershedN + 'Press.nc'
@@ -232,9 +227,8 @@ for cYear in range(startYear,endYear):
     climateFunctions_2.compute_average_windSpeed(intermU, 'UGRD10m_110_HTGL', intermV, 'VGRD10m_110_HTGL', windIn,'windS10')
     climateFunctions_2.compute_vaporPressure_from_SpecficHumidity(intermQ, 'SPFH2m_110_HTGL', intermPr, 'PRESsfc_110_SFC', vpIn, 'VP')
     """
-
-    """
     #elevation adjustment
+    """
     watershedFunctions_2.project_and_resample_Raster_to_ReferenceNetcdf(nldasDEM,watershedN,projDEMnlads)
     watershedFunctions_2.project_and_resample_Raster_to_ReferenceNetcdf(nedDEM,watershedN,projDEMned)
     climateFunctions_2.adjust_for_elevation_VaporPressure(vpIn,vpIn,'VP',projDEMnldas,projDEMned,baseDateTime=str(cYear)+'/10/01 0')
@@ -244,8 +238,6 @@ for cYear in range(startYear,endYear):
     #precip elevatin adj. if required
     #elevation adj spechum
     """
-
-
 
     cmdString = 'mv -f -t ' + targetDirVPW + ' ' + vpIn
     callSubprocess.callSubprocess(cmdString, "move subset nc")
