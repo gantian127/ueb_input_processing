@@ -12,7 +12,7 @@ epsgCode = 26912    #26912                 #26912 utm 12
 dx,dy = 30, 30  #  Grid cell sizes (m) for reprojection
 
 # Dolores at Dolores
-leftX, topY, rightX, bottomY = -108.525, 37.865, -107.85, 37.43  # exact box: -108.51773, 37.857910, -107.863539, 37.437081
+leftX, topY, rightX, bottomY = -108.525, 37.865, -107.85, 37.415  # exact box: -108.51773, 37.857910, -107.863539, 37.428745
 watershedN = 'Mcphee_DOLC2'
 
 # # Cell spacing for subsampled UEB model (m)

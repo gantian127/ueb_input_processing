@@ -9,7 +9,7 @@ import watershedFunctions
 main_folder = "/Projects/Tian_workspace/rdhm_ueb_modeling/animas_2007_rec/"
 
 # Dolores at Dolores
-leftX, topY, rightX, bottomY = -108.525, 37.865, -107.85, 37.43  # exact box: -108.51773, 37.857910, -107.863539, 37.437081
+leftX, topY, rightX, bottomY = -108.525, 37.865, -107.85, 37.415  # exact box: -108.51773, 37.857910, -107.863539, 37.428745
 watershedN = 'Mcphee_DOLC2'
 
 startYear = 2006 # datetime.strptime(startDateTime,"%Y/%m/%d %H").year
