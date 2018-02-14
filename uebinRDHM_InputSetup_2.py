@@ -5,22 +5,27 @@ from datetime import datetime
 import callSubprocess
 import watershedFunctions
 
+# user settings to change
 ## Domain bounding box in geographic coordinates left, top, right, bottom.  Must enclose watershed of interest
-# Animas River WS above Durango
-leftX, topY, rightX, bottomY =  -108.15, 38.06, -107.41, 37.16
+# # Animas River WS above Durango
+# leftX, topY, rightX, bottomY = -108.15, 38.06, -107.41, 37.16
+# watershedN = 'Animas'
 
-watershedN = 'Animas'
+# Dolores at Dolores
+leftX, topY, rightX, bottomY = -108.525, 37.865, -107.85, 37.43  # exact box: -108.51773, 37.857910, -107.863539, 37.437081
+watershedN = 'Mcphee_DOLC2'
+
+main_folder = "/Projects/Tian_workspace/rdhm_ueb_modeling/animas_2007_rec/"
+
 startYear = 2006 # datetime.strptime(startDateTime,"%Y/%m/%d %H").year
 endYear = 2007  # datetime.strptime(endDateTime,"%Y/%m/%d %H").year
 startMonthDayHour = "10/01 0"
 endMonthDayHour = "10/01 0"
 
-main_folder = "/Projects/Tian_workspace/rdhm_ueb_modeling/animas_2007_rec/"
+# make tempdir
 workingDir = main_folder + 'tempdir'  # This should be a temp folder under the main folder. It is used to store the temp data for nldas processing
 if not os.path.isdir(workingDir):
     os.mkdir(workingDir)
-
-##reference xmrg file ---must be located in the workingDir
 
 # proj4_string: see the paper: Reed, S.M., and D.R. Maidment, "Coordinate Transformations for Using NEXRAD Data in GIS-based Hydrologic Modeling," Journal of Hydrologic Engineering, 4, 2, 174-182, April 1999
 ## http://www.nws.noaa.gov/ohd/hrl/distmodel/hrap.htm#backgroundworkingDir

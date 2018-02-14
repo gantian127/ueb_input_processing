@@ -2,7 +2,21 @@ __author__ = 'tsega'
 from hydrods_python_client import HydroDS
 from datetime import datetime, timedelta
 """*********** Terrain and Land cover for UEB using HydroDS *****************"""
+
+# # user settings to change
 workingDir = "/Projects/Tian_workspace/rdhm_ueb_modeling/animas_2007_rec/"
+
+# Grid projection
+#utmZone = int((180 + 0.5*(xmin+xmax))/6) + 1
+epsgCode = 26912    #26912                 #26912 utm 12
+dx,dy = 30, 30  #  Grid cell sizes (m) for reprojection
+
+# Dolores at Dolores
+leftX, topY, rightX, bottomY = -108.525, 37.865, -107.85, 37.43  # exact box: -108.51773, 37.857910, -107.863539, 37.437081
+watershedN = 'Mcphee_DOLC2'
+
+# # Cell spacing for subsampled UEB model (m)
+# dxRes, dyRes = 1200, 1200
 ## Domain bounding box in geographic coordinates left, top, right, bottom.  Must enclose watershed of interest
 # use rectangular domain--no WS delineation
 
@@ -12,17 +26,6 @@ workingDir = "/Projects/Tian_workspace/rdhm_ueb_modeling/animas_2007_rec/"
 # leftX, topY, rightX, bottomY =  -108.15, 38.06, -107.41, 37.16
 # watershedN = 'Animas'
 
-# Dolores at Dolores
-leftX, topY, rightX, bottomY = -108.52, 37.86, -107.98, 37.43  # exact box: -108.51773, 37.857910, -107.984374, 37.437081
-watershedN = 'Mcphee_DOLC2'
-
-
-# Grid projection
-#utmZone = int((180 + 0.5*(xmin+xmax))/6) + 1
-epsgCode = 26912    #26912                 #26912 utm 12
-dx,dy = 30, 30  #  Grid cell sizes (m) for reprojection
-# # Cell spacing for subsampled UEB model (m)
-# dxRes, dyRes = 1200, 1200
 """*************************************************************************"""
 HDS = HydroDS(username='tianG', password='tianGan_2016')
 
