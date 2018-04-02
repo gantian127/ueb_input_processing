@@ -5,28 +5,20 @@ from datetime import datetime
 import callSubprocess
 import watershedFunctions
 
-# user settings to change
-main_folder = "/Projects/Tian_workspace/rdhm_ueb_modeling/animas_2007_rec/"
-
-# Dolores at Dolores
-leftX, topY, rightX, bottomY = -108.525, 37.865, -107.85, 37.415  # exact box: -108.51773, 37.857910, -107.863539, 37.428745
+## Domain bounding box in geographic coordinates left, top, right, bottom.  Must enclose watershed of interest
+# Animas River WS above Durango
+#leftX, topY, rightX, bottomY =  -108.15, 38.06, -107.41, 37.16
+# Green River near Daniel at Warren Bridge
+leftX, topY, rightX, bottomY =  -108.71, 38.05, -107.66, 37.22  # exact box: -108.51773, 37.857910, -107.863539, 37.428745
 watershedN = 'Mcphee_DOLC2'
-
-startYear = 2006 # datetime.strptime(startDateTime,"%Y/%m/%d %H").year
-endYear = 2007  # datetime.strptime(endDateTime,"%Y/%m/%d %H").year
+startYear = 1988  # datetime.strptime(startDateTime,"%Y/%m/%d %H").year
+endYear = 2010  # datetime.strptime(endDateTime,"%Y/%m/%d %H").year
 startMonthDayHour = "10/01 0"
 endMonthDayHour = "10/01 0"
 
-## Domain bounding box in geographic coordinates left, top, right, bottom.  Must enclose watershed of interest
-# # Animas River WS above Durango
-# leftX, topY, rightX, bottomY = -108.15, 38.06, -107.41, 37.16
-# watershedN = 'Animas'
-
-
-# make tempdir
-workingDir = main_folder + 'tempdir'  # This should be a temp folder under the main folder. It is used to store the temp data for nldas processing
-if not os.path.isdir(workingDir):
-    os.mkdir(workingDir)
+workingDir = "/Projects/Tian_workspace/rdhm_ueb_modeling/McPhee_DOLC2/"
+os.chdir(workingDir)
+##reference xmrg file ---must be located in the workingDir
 
 # proj4_string: see the paper: Reed, S.M., and D.R. Maidment, "Coordinate Transformations for Using NEXRAD Data in GIS-based Hydrologic Modeling," Journal of Hydrologic Engineering, 4, 2, 174-182, April 1999
 ## http://www.nws.noaa.gov/ohd/hrl/distmodel/hrap.htm#backgroundworkingDir
@@ -35,32 +27,26 @@ UNIT["degree",0.0174532925199433]],PROJECTION["Polar_Stereographic"],PARAMETER["
 PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]]]'
 ##proj4_string = '+proj=stere +lat_0=90.0 +lat_ts=60.0 +lon_0=-105.0 +k=1 +x_0=0.0 +y_0=0.0 +a=6371200 +b=6371200 +units=m +no_defs'
 
-inputXmrgRaster = 'xmrg1001198812z.gz'
-referenceRasterASCII = os.path.join(workingDir, watershedN+'_refRaster.asc')
-referenceRasterTIF = os.path.join(workingDir, watershedN+'_refRaster.tif')
-referenceRasterNC = os.path.join(workingDir, watershedN+'_refRaster.nc')
+inputXmrgRaster = 'xmrg1001200612z.gz'
+referenceRasterASCII = watershedN+'_refRaster.asc'
+referenceRasterTIF = watershedN+'_refRaster.tif'
+referenceRasterNC = watershedN+'_refRaster.nc'
 cmdString = 'xmrgtoasc -p ster -i ' + inputXmrgRaster + ' -o ' + referenceRasterASCII
 callSubprocess.callSubprocess(cmdString, "xmrg to ascii")
 cmdString = "gdal_translate -a_srs \"" + proj4_string + "\" "+referenceRasterASCII+" "+referenceRasterTIF
 callSubprocess.callSubprocess(cmdString, "ascii to tif")
 watershedFunctions.rasterToNetCDF(referenceRasterTIF, referenceRasterNC)
 
-
 # cbrfc forcing
 #cbrfc forcing is converted to xmrg for the whole upper colorado --similar to what RTI are doing
-print 'start cbrfc processing'
 workingDir1 = "/Projects/cbrfcTP/"
-targetDir1 = os.path.join(main_folder, "Forcing/")
 os.chdir(workingDir1)
-if not os.path.isdir(targetDir1):
-    os.mkdir(targetDir1)
-print 'subset and copy cbrfc to forcing folder'
+targetDir1 = workingDir +"Forcing/"
 for year in range(startYear, endYear + 1):
     cmdString = "for i in mm_" + str(year) + "*.nc.gz; do gunzip -cdfq $i>${i//.gz} && ncea -d x," + str(leftX) + "," + str(rightX) \
                 + " -d y,"+str(bottomY) + "," + str(topY) + " -O ${i//.gz} ${i//.gz} && mv -f -t " + targetDir1 + " ${i//.gz}; done"
     callSubprocess.callSubprocess(cmdString, 'subset nc and move')
 
-print 'create hourly temp, prcp, max/min temp'
 os.chdir(targetDir1)
 cmdString = \
     'for i in mm_*.nc; do ' \
@@ -119,7 +105,7 @@ cmdString = \
     '   rm -f R_$i; ' \
     '   rm -f $i; ' \
     'done'
-# print(cmdString)
+print(cmdString)
 callSubprocess.callSubprocess(cmdString, 'subset nc in time')
 
 cmdString = "for i in Prec*.nc; do " \
@@ -131,6 +117,7 @@ callSubprocess.callSubprocess(cmdString, 'convert netcdf units')
 cmdString = "for i in Tair*.nc; do " \
                 "ncap2 -s'otgrid=0.5556f*otgrid-17.7778' -O $i $i && "\
                 "ncatted -a units,otgrid,m,c,'oC' -O $i $i; "\
+                "ncatted -a long_name,otgrid,m,c,'Temperature' -O $i $i; " \
                 "done"
 callSubprocess.callSubprocess(cmdString, 'convert netcdf units')
 cmdString = "for i in Tamin*.nc; do " \
@@ -146,7 +133,6 @@ cmdString = "for i in Tamax*.nc; do " \
                 "done"
 callSubprocess.callSubprocess(cmdString, 'convert netcdf units')
 
-print 'finish cbrfc processing'
 """
 # this can be used when sampling to watershed domain defined by connectivity file (output from RDHM)
 #cbrfc forcing
@@ -181,10 +167,8 @@ for cYear in range(startYear,endYear):
 """
 
 #nldas2
-print 'start nldas processing'
 workingDir2 = "/Projects/nldasMonthly/"
-targetDirVPW = os.path.join(main_folder, "Forcing")
-
+targetDirVPW = workingDir+"Forcing/"
 intermQ = watershedN + 'Q.nc'
 intermPress = watershedN + 'Press.nc'
 intermU = watershedN + 'U10.nc'
@@ -250,6 +234,7 @@ for cYear in range(startYear,endYear):
     cmdString = 'mv -f -t ' + targetDirVPW + ' ' + windIn
     callSubprocess.callSubprocess(cmdString, "move subset nc")
 
-print 'nldas process is done'
+
+print("done")
 
 
