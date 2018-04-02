@@ -1,3 +1,6 @@
+"""
+This is the version that prepare the terrain data and the hourly prcp, temp, tmax, tmin, wind, vp code.
+"""
 __author__ = 'tsega'
 from hydrods_python_client import HydroDS
 import callSubprocess
