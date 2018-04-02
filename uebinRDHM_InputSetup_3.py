@@ -90,17 +90,29 @@ for indx in range(2):
     #callSubprocess.callSubprocess(cmdString, "delete orig files")
 
 #NLDAS VP and WindS
-nldasinputForc = [watershedN+str(endYear)+'VP.nc',watershedN+str(endYear)+'windS10m.nc']
-outVars = ["uebVp", "uebWindS"]
-nldasvarForc = ['VP','windS10']
-for indx in range(2):
-    rdhmFunctions.create_multiple_Ascii_fromNetCDF(nldasinputForc[indx], outVars[indx], nldasvarForc[indx], 1,
-                                                   startDateTime=startDateTime, time_varName=time_varName,proj4_string=proj4_string)
-    cmdString = "for i in *.asc; do asctoxmrg -i $i -f par -p ster; done"
-    callSubprocess.callSubprocess(cmdString, "ascii to xmrg")
-    # delete the ascii files
-    cmdString = " rm -f *.asc *asc.aux.xml *.prj"
-    callSubprocess.callSubprocess(cmdString, "delete ascii")
+forcingTargetDir = workingDir+"Forcing2/"
+os.chdir(forcingTargetDir)
+startMonthDayHour = "10/01 0"
+endMonthDayHour = "10/01 0"
+#NLDAS VP and WindS
+for cYear in range(startYear,endYear):
+    print cYear
+    nldasinputForc = [watershedN+str(cYear + 1)+'VP.nc',watershedN+str(cYear + 1)+'windS10m.nc']
+    outVars = ["uebVp", "uebWindS"]
+    nldasvarForc = ['VP', 'windS10']
+    startDateTime = str(cYear) + "/" + startMonthDayHour
+    for indx in range(2):
+        print nldasinputForc[indx]
+        print nldasvarForc[indx]
+        print startDateTime
+        rdhmFunctions.create_multiple_Ascii_fromNetCDF(nldasinputForc[indx], outVars[indx], nldasvarForc[indx], 1,
+                                                       startDateTime=startDateTime, time_varName=time_varName,proj4_string=proj4_string)
+        print 'done with create multiple netcdf'
+        cmdString = "for i in *.asc; do asctoxmrg -i $i -f par -p ster; done"
+        callSubprocess.callSubprocess(cmdString, "ascii to xmrg")
+        # delete the ascii files
+        # cmdString = " rm -f *.asc *asc.aux.xml *.prj"
+        # callSubprocess.callSubprocess(cmdString, "delete ascii")
 
 print("done")
 
