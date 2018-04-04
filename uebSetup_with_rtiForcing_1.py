@@ -2,20 +2,28 @@
 This is used to prepare the terrain and wind, vp, tmax, tmin hourly data used for running RDHM UEB with
 RTI 1d prcp, temp data.
 
-This is based on the code of uebinRDHM_InputSetup_X.py
+This is based on the code of uebinRDHM_InputSetup_1.py
+
+comments:
+after code run, create a folder 'SiteV' and unzip the downloaded zip file into that folder
+$ unzip zipfile.zip -d ./SiteV
 """
 
 from hydrods_python_client import HydroDS
 import callSubprocess
 from datetime import datetime, timedelta
 """*********** Terrain and Land cover for UEB using HydroDS *****************"""
-workingDir = "/Projects/Tian_workspace/rdhm_ueb_modeling/McPhee_DOLC2/"
+workingDir = "/Projects/Tian_workspace/rdhm_ueb_modeling/McPhee_MPHC2/MPHC2_forcing/"
 ## Domain bounding box in geographic coordinates left, top, right, bottom.  Must enclose watershed of interest
 # use rectangular domain--no WS delineation
 
-# Dolores at Dolores
-leftX, topY, rightX, bottomY = -108.71, 38.05, -107.66, 37.22  # exact box: -108.51773, 37.857910, -107.863539, 37.428745
-watershedName = 'Mcphee_DOLC2'
+# # DOLC2 at Mcphee
+# leftX, topY, rightX, bottomY = -108.71, 38.05, -107.66, 37.22  # exact box: -108.51773, 37.857910, -107.863539, 37.428745
+# watershedName = 'Mcphee_DOLC2'
+
+# MPHC2 at Mcphee
+leftX, topY, rightX, bottomY = -108.80, 38.05, -107.66, 37.22  # exact box: -108.601067, 37.857910, -107.863539, 37.428745
+watershedName = 'Mcphee_MPHC2'
 
 # Grid projection
 #utmZone = int((180 + 0.5*(xmin+xmax))/6) + 1
@@ -101,7 +109,3 @@ zip_files_result = HDS.zip_files(files_to_zip=ueb_inputPackage_dict, zip_file_na
 HDS.download_file(file_url_path=zip_files_result['zip_file_name'], save_as=workingDir+zipFileName)
 
 print('Done')
-
-
-
-

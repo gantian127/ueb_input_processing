@@ -1,3 +1,14 @@
+"""
+This is used to prepare the terrain and wind, vp, tmax, tmin hourly data used for running RDHM UEB with
+RTI 1d prcp, temp data.
+
+This is based on the code of uebinRDHM_InputSetup_1.py
+
+comments:
+after code run, create a folder 'SiteV' and unzip the downloaded zip file into that folder
+$ unzip zipfile.zip -d ./SiteV
+"""
+
 import os
 import netcdfFunctions
 import climateFunctions_2
@@ -6,18 +17,21 @@ import callSubprocess
 import watershedFunctions
 
 ## Domain bounding box in geographic coordinates left, top, right, bottom.  Must enclose watershed of interest
-# Animas River WS above Durango
-#leftX, topY, rightX, bottomY =  -108.15, 38.06, -107.41, 37.16
-# Green River near Daniel at Warren Bridge
-leftX, topY, rightX, bottomY =  -108.71, 38.05, -107.66, 37.22  # exact box: -108.51773, 37.857910, -107.863539, 37.428745
-watershedN = 'Mcphee_DOLC2'
+# # DOLC2 at Mcphee
+# leftX, topY, rightX, bottomY =  -108.71, 38.05, -107.66, 37.22  # exact box: -108.51773, 37.857910, -107.863539, 37.428745
+# watershedN = 'Mcphee_DOLC2'
+# DOLC2 at Mcphee
+leftX, topY, rightX, bottomY = -108.80, 38.05, -107.66, 37.22  # exact box: -108.601067, 37.857910, -107.863539, 37.428745
+watershedN = 'Mcphee_MPHC2'
+
 startYear = 1988  # datetime.strptime(startDateTime,"%Y/%m/%d %H").year
 endYear = 2010  # datetime.strptime(endDateTime,"%Y/%m/%d %H").year
 startMonthDayHour = "10/01 0"
 endMonthDayHour = "10/01 0"
 
-workingDir = "/Projects/Tian_workspace/rdhm_ueb_modeling/McPhee_DOLC2/"
+workingDir = "/Projects/Tian_workspace/rdhm_ueb_modeling/McPhee_MPHC2/MPHC2_forcing/"
 os.chdir(workingDir)
+os.mkdir('Forcing')
 ##reference xmrg file ---must be located in the workingDir
 
 # proj4_string: see the paper: Reed, S.M., and D.R. Maidment, "Coordinate Transformations for Using NEXRAD Data in GIS-based Hydrologic Modeling," Journal of Hydrologic Engineering, 4, 2, 174-182, April 1999
@@ -27,7 +41,7 @@ UNIT["degree",0.0174532925199433]],PROJECTION["Polar_Stereographic"],PARAMETER["
 PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]]]'
 ##proj4_string = '+proj=stere +lat_0=90.0 +lat_ts=60.0 +lon_0=-105.0 +k=1 +x_0=0.0 +y_0=0.0 +a=6371200 +b=6371200 +units=m +no_defs'
 
-inputXmrgRaster = 'xmrg1001200612z.gz'
+inputXmrgRaster = 'we0101198906z.gz'
 referenceRasterASCII = watershedN+'_refRaster.asc'
 referenceRasterTIF = watershedN+'_refRaster.tif'
 referenceRasterNC = watershedN+'_refRaster.nc'
@@ -39,6 +53,7 @@ watershedFunctions.rasterToNetCDF(referenceRasterTIF, referenceRasterNC)
 
 # cbrfc forcing
 #cbrfc forcing is converted to xmrg for the whole upper colorado --similar to what RTI are doing
+print 'start tmax and tmin preparation'
 workingDir1 = "/Projects/cbrfcTP/"
 os.chdir(workingDir1)
 targetDir1 = workingDir +"Forcing/"
@@ -108,29 +123,27 @@ cmdString = \
 print(cmdString)
 callSubprocess.callSubprocess(cmdString, 'subset nc in time')
 
-cmdString = "for i in Prec*.nc; do " \
-                "ncap2 -s'ogrid=0.008467f*ogrid' -O $i $i && "\
-                "ncatted -a units,ogrid,m,c,'m/hr' -O $i $i; "\
-                "ncatted -a long_name,ogrid,m,c,'Hourly precipitation rate' -O $i $i; " \
-                "done"
-callSubprocess.callSubprocess(cmdString, 'convert netcdf units')
-cmdString = "for i in Tair*.nc; do " \
-                "ncap2 -s'otgrid=0.5556f*otgrid-17.7778' -O $i $i && "\
-                "ncatted -a units,otgrid,m,c,'oC' -O $i $i; "\
-                "ncatted -a long_name,otgrid,m,c,'Temperature' -O $i $i; " \
-                "done"
+# cmdString = "for i in Prec*.nc; do " \
+#                 "ncap2 -s'ogrid=0.008467f*ogrid' -O $i $i && "\
+#                 "ncatted -a units,ogrid,m,c,'m/hr' -O $i $i; "\
+#                 "ncatted -a long_name,ogrid,m,c,'Hourly precipitation rate' -O $i $i; " \
+#                 "done"
+# callSubprocess.callSubprocess(cmdString, 'convert netcdf units')
+# cmdString = "for i in Tair*.nc; do " \
+#                 "ncap2 -s'otgrid=0.5556f*otgrid-17.7778' -O $i $i && "\
+#                 "ncatted -a units,otgrid,m,c,'oC' -O $i $i; "\
+#                 "ncatted -a long_name,otgrid,m,c,'Temperature' -O $i $i; " \
+#                 "done"
 callSubprocess.callSubprocess(cmdString, 'convert netcdf units')
 cmdString = "for i in Tamin*.nc; do " \
-                "ncap2 -s'otgrid=0.5556f*otgrid-17.7778' -O $i $i && "\
-                "ncatted -a units,otgrid,m,c,'oC' -O $i $i; "\
-                "ncatted -a long_name,otgrid,m,c,'Daily minimum temperature' -O $i $i; " \
-                "done"
+            "ncatted -a units,otgrid,m,c,'oF' -O $i $i; "\
+            "ncatted -a long_name,otgrid,m,c,'Daily minimum temperature' -O $i $i; " \
+            "done"
 callSubprocess.callSubprocess(cmdString, 'convert netcdf units')
 cmdString = "for i in Tamax*.nc; do " \
-                "ncap2 -s'otgrid=0.5556f*otgrid-17.7778' -O $i $i && "\
-                "ncatted -a units,otgrid,m,c,'oC' -O $i $i; "\
-                "ncatted -a long_name,otgrid,m,c,'Daily maximum temperature' -O $i $i; " \
-                "done"
+            "ncatted -a units,otgrid,m,c,'oF' -O $i $i; "\
+            "ncatted -a long_name,otgrid,m,c,'Daily maximum temperature' -O $i $i; " \
+            "done"
 callSubprocess.callSubprocess(cmdString, 'convert netcdf units')
 
 """
@@ -167,6 +180,7 @@ for cYear in range(startYear,endYear):
 """
 
 #nldas2
+print 'start wind and vp preparation'
 workingDir2 = "/Projects/nldasMonthly/"
 targetDirVPW = workingDir+"Forcing/"
 intermQ = watershedN + 'Q.nc'

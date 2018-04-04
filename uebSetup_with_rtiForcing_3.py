@@ -4,8 +4,8 @@ from datetime import datetime
 import rdhmFunctions
 import callSubprocess
 """*********** Convert UEB NC files to XMRG with HRAP projection *****************"""
-workingDir = "/Projects/Tian_workspace/rdhm_ueb_modeling/McPhee_DOLC2/"
-watershedN = 'Mcphee_DOLC2'
+workingDir = "/Projects/Tian_workspace/rdhm_ueb_modeling/McPhee_MPHC2/MPHC2_forcing/"
+watershedN = 'Mcphee_MPHC2'
 startDateTime = "1988/10/01 0"
 endDateTime = "2010/10/01"
 startYear = 1988  # datetime.strptime(startDateTime,"%Y/%m/%d %H").year
@@ -43,31 +43,34 @@ cmdString = " for i in *.asc; do asctoxmrg -i $i -p ster -f par; done"
 callSubprocess.callSubprocess(cmdString, "ascii to xmrg")
 
 ### forcing
-#cbrfc forc
-inpVar =  ["Prec", "Tair"]
-forcingTargetDir = workingDir+"Forcing/"
-os.chdir(forcingTargetDir)
-for indx in range(2):
-    cmdString = "for i in "+inpVar[indx]+"*.nc; do gdalwarp -ot Float32 -s_srs EPSG:4326 -t_srs \"" + proj4_string + "\"" + " $i ueb${i:0:4}${i:12:2}${i:14:2}${i:8:4}${i:16:2}z.tif; done"
-    callSubprocess.callSubprocess(cmdString, "project forcing")
-    # ascii
-    cmdString = "for i in *.tif; do gdal_translate -of AAIGrid $i ${i//.tif}.asc; done"
-    callSubprocess.callSubprocess(cmdString, "tif to ascii")
-    #to xmrg
-    cmdString = "for i in *.asc; do asctoxmrg -i $i -f par -p ster; done"
-    callSubprocess.callSubprocess(cmdString, "ascii to xmrg")
-    #del intrm files
-    cmdString = " rm -f *tif"
-    callSubprocess.callSubprocess(cmdString, "delete intermediate files")
-    cmdString = " rm -f *asc"
-    callSubprocess.callSubprocess(cmdString, "delete intermediate files")
-    cmdString = " rm -f *.xml *.prj"
-    callSubprocess.callSubprocess(cmdString, "delete intermediate files")
-    ##delete nc file to save space
-    cmdString = " rm -f *.nc"
-    #callSubprocess.callSinpVar =  ["Prec", "Tair", "Tamin", "Tamax"]
+# #cbrfc forc
+# inpVar =  ["Prec", "Tair"]
+# forcingTargetDir = workingDir+"Forcing/"
+# os.chdir(forcingTargetDir)
+# for indx in range(2):
+#     cmdString = "for i in "+inpVar[indx]+"*.nc; do gdalwarp -ot Float32 -s_srs EPSG:4326 -t_srs \"" + proj4_string + "\"" + " $i ueb${i:0:4}${i:12:2}${i:14:2}${i:8:4}${i:16:2}z.tif; done"
+#     callSubprocess.callSubprocess(cmdString, "project forcing")
+#     # ascii
+#     cmdString = "for i in *.tif; do gdal_translate -of AAIGrid $i ${i//.tif}.asc; done"
+#     callSubprocess.callSubprocess(cmdString, "tif to ascii")
+#     #to xmrg
+#     cmdString = "for i in *.asc; do asctoxmrg -i $i -f par -p ster; done"
+#     callSubprocess.callSubprocess(cmdString, "ascii to xmrg")
+#     #del intrm files
+#     cmdString = " rm -f *tif"
+#     callSubprocess.callSubprocess(cmdString, "delete intermediate files")
+#     cmdString = " rm -f *asc"
+#     callSubprocess.callSubprocess(cmdString, "delete intermediate files")
+#     cmdString = " rm -f *.xml *.prj"
+#     callSubprocess.callSubprocess(cmdString, "delete intermediate files")
+#     ##delete nc file to save space
+#     cmdString = " rm -f *.nc"
+#     #callSubprocess.callSinpVar =  ["Prec", "Tair", "Tamin", "Tamax"]
 
 #max/min Ta
+print 'start Tmax, Tmin preparation'
+forcingTargetDir = workingDir+"Forcing/"
+os.chdir(forcingTargetDir)
 inpVar =  ["Tamin", "Tamax"]
 for indx in range(2):
     cmdString = "for i in "+inpVar[indx]+"*.nc; do gdalwarp -ot Float32 -s_srs EPSG:4326 -t_srs \"" + proj4_string + "\"" + " $i ueb${i:0:5}${i:13:2}${i:15:2}${i:9:4}${i:17:2}z.tif; done"
@@ -90,7 +93,8 @@ for indx in range(2):
     #callSubprocess.callSubprocess(cmdString, "delete orig files")
 
 #NLDAS VP and WindS
-forcingTargetDir = workingDir+"Forcing2/"
+print 'start wind, vp preparation'
+forcingTargetDir = workingDir+"Forcing/"
 os.chdir(forcingTargetDir)
 startMonthDayHour = "10/01 0"
 endMonthDayHour = "10/01 0"
