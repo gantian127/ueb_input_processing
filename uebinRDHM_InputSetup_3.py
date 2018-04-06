@@ -115,11 +115,11 @@ for cYear in range(startYear,endYear):
         # callSubprocess.callSubprocess(cmdString, "delete ascii")
 
         # delete the ascii files
-        cmdString = " rm -f *.asc "
+        cmdString = "find . -name '*.asc' -delete"  # " rm -f *.asc "
         callSubprocess.callSubprocess(cmdString, "delete ascii")
-        cmdString = " rm -f  *asc.aux.xml"
+        cmdString = "find . -name '*.asc.aux.xml' -delete"  # " rm -f  *asc.aux.xml"
         callSubprocess.callSubprocess(cmdString, "delete ascii")
-        cmdString = " rm -f  *.prj"
+        cmdString = "find . -name '*.prj' -delete"  #"  rm -f  *.prj"
         callSubprocess.callSubprocess(cmdString, "delete ascii")
 
 print("done")
