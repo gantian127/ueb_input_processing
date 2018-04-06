@@ -88,9 +88,9 @@ for indx in range(2):
     callSubprocess.callSubprocess(cmdString, "delete intermediate files")
     cmdString = " rm -f *.xml *.prj"
     callSubprocess.callSubprocess(cmdString, "delete intermediate files")
-    ##delete nc file to save space
+    #delete nc file to save space
     cmdString = " rm -f *.nc"
-    #callSubprocess.callSubprocess(cmdString, "delete orig files")
+    callSubprocess.callSubprocess(cmdString, "delete orig files")
 
 #NLDAS VP and WindS
 print 'start wind, vp preparation'
@@ -111,9 +111,10 @@ for cYear in range(startYear,endYear):
         print startDateTime
         rdhmFunctions.create_multiple_Ascii_fromNetCDF(nldasinputForc[indx], outVars[indx], nldasvarForc[indx], 1,
                                                        startDateTime=startDateTime, time_varName=time_varName,proj4_string=proj4_string)
-        print 'done with create multiple netcdf'
+        print 'done with create multiple ascii'
         cmdString = "for i in *.asc; do asctoxmrg -i $i -f par -p ster; done"
         callSubprocess.callSubprocess(cmdString, "ascii to xmrg")
+        print 'donw with create mulitle xmrg'
         # delete the ascii files
         # cmdString = " rm -f *.asc *asc.aux.xml *.prj"
         # callSubprocess.callSubprocess(cmdString, "delete ascii")
