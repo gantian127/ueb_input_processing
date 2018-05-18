@@ -13,18 +13,19 @@ import callSubprocess
 import watershedFunctions
 
 ## Domain bounding box in geographic coordinates left, top, right, bottom.  Must enclose watershed of interest
-# Animas River WS above Durango
-#leftX, topY, rightX, bottomY =  -108.15, 38.06, -107.41, 37.16
-# Green River near Daniel at Warren Bridge
-leftX, topY, rightX, bottomY =  -108.71, 38.05, -107.66, 37.22  # exact box: -108.51773, 37.857910, -107.863539, 37.428745
-watershedN = 'Mcphee_DOLC2'
-startYear = 1988  # datetime.strptime(startDateTime,"%Y/%m/%d %H").year
-endYear = 2010  # datetime.strptime(endDateTime,"%Y/%m/%d %H").year
+
+# Mcphee
+leftX, topY, rightX, bottomY = -108.80, 38.05, -107.66, 37.22  # exact box: -108.601067, 37.857910, -107.863539, 37.428745
+watershedN = 'Mcphee_MPHC2'
+
+startYear = 2010  # datetime.strptime(startDateTime,"%Y/%m/%d %H").year
+endYear = 2015  # datetime.strptime(endDateTime,"%Y/%m/%d %H").year
 startMonthDayHour = "10/01 0"
 endMonthDayHour = "10/01 0"
 
-workingDir = "/Projects/Tian_workspace/rdhm_ueb_modeling/McPhee_DOLC2/"
+workingDir = "/Projects/Tian_workspace/rdhm_ueb_modeling/McPhee_MPHC2/MPHC2_forcing_validation/"
 os.chdir(workingDir)
+os.mkdir('Forcing')
 ##reference xmrg file ---must be located in the workingDir
 
 # proj4_string: see the paper: Reed, S.M., and D.R. Maidment, "Coordinate Transformations for Using NEXRAD Data in GIS-based Hydrologic Modeling," Journal of Hydrologic Engineering, 4, 2, 174-182, April 1999
@@ -34,7 +35,7 @@ UNIT["degree",0.0174532925199433]],PROJECTION["Polar_Stereographic"],PARAMETER["
 PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]]]'
 ##proj4_string = '+proj=stere +lat_0=90.0 +lat_ts=60.0 +lon_0=-105.0 +k=1 +x_0=0.0 +y_0=0.0 +a=6371200 +b=6371200 +units=m +no_defs'
 
-inputXmrgRaster = 'xmrg1001200612z.gz'
+inputXmrgRaster = 'we0101198906z.gz'
 referenceRasterASCII = watershedN+'_refRaster.asc'
 referenceRasterTIF = watershedN+'_refRaster.tif'
 referenceRasterNC = watershedN+'_refRaster.nc'
@@ -46,6 +47,7 @@ watershedFunctions.rasterToNetCDF(referenceRasterTIF, referenceRasterNC)
 
 # cbrfc forcing
 #cbrfc forcing is converted to xmrg for the whole upper colorado --similar to what RTI are doing
+print 'start tair, prec'
 workingDir1 = "/Projects/cbrfcTP/"
 os.chdir(workingDir1)
 targetDir1 = workingDir +"Forcing/"
@@ -171,6 +173,7 @@ for cYear in range(startYear,endYear):
 """
 
 #nldas2
+print 'start wind, vp preparation'
 workingDir2 = "/Projects/nldasMonthly/"
 targetDirVPW = workingDir+"Forcing/"
 intermQ = watershedN + 'Q.nc'

@@ -12,7 +12,7 @@ from hydrods_python_client import HydroDS
 import callSubprocess
 from datetime import datetime, timedelta
 """*********** Terrain and Land cover for UEB using HydroDS *****************"""
-workingDir = "/Projects/Tian_workspace/rdhm_ueb_modeling/McPhee_MPHC2/MPHC2_forcing/"
+workingDir = "/Projects/Tian_workspace/rdhm_ueb_modeling/McPhee_MPHC2/MPHC2_forcing_validation/"
 ## Domain bounding box in geographic coordinates left, top, right, bottom.  Must enclose watershed of interest
 # use rectangular domain--no WS delineation
 

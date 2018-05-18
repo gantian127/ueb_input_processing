@@ -11,12 +11,12 @@ from datetime import datetime
 import rdhmFunctions
 import callSubprocess
 """*********** Convert UEB NC files to XMRG with HRAP projection *****************"""
-workingDir = "/Projects/Tian_workspace/rdhm_ueb_modeling/McPhee_DOLC2/"
-watershedN = 'Mcphee_DOLC2'
-startDateTime = "1988/10/01 0"
-endDateTime = "2010/10/01"
-startYear = 1988  # datetime.strptime(startDateTime,"%Y/%m/%d %H").year
-endYear = 2010  # datetime.strptime(endDateTime,"%Y/%m/%d %H").year
+workingDir = "/Projects/Tian_workspace/rdhm_ueb_modeling/McPhee_MPHC2/MPHC2_forcing_validation/"
+watershedN = 'Mcphee_MPHC2'
+startDateTime = "2010/10/01 0"
+endDateTime = "2015/10/01"
+startYear = 2010  # datetime.strptime(startDateTime,"%Y/%m/%d %H").year
+endYear = 2015  # datetime.strptime(endDateTime,"%Y/%m/%d %H").year
 time_varName='time'
 
 #proj4_string: see the paper: Reed, S.M., and D.R. Maidment, "Coordinate Transformations for Using NEXRAD Data in GIS-based Hydrologic Modeling," Journal of Hydrologic Engineering, 4, 2, 174-182, April 1999
@@ -51,6 +51,7 @@ callSubprocess.callSubprocess(cmdString, "ascii to xmrg")
 
 ### forcing
 #cbrfc forc
+print 'start prec, temp'
 inpVar =  ["Prec", "Tair"]
 forcingTargetDir = workingDir+"Forcing/"
 os.chdir(forcingTargetDir)
@@ -97,7 +98,8 @@ for indx in range(2):
     #callSubprocess.callSubprocess(cmdString, "delete orig files")
 
 #NLDAS VP and WindS
-forcingTargetDir = workingDir+"Forcing2/"
+print 'vp and wind'
+forcingTargetDir = workingDir+"Forcing/"
 os.chdir(forcingTargetDir)
 startMonthDayHour = "10/01 0"
 endMonthDayHour = "10/01 0"
@@ -129,6 +131,6 @@ for cYear in range(startYear,endYear):
         cmdString = "find . -name '*.prj' -delete"  #"  rm -f  *.prj"
         callSubprocess.callSubprocess(cmdString, "delete ascii")
 
-print("done")
+print("step3 done")
 
 
